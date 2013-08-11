@@ -8,14 +8,8 @@ command :'app_ids:list' do |c|
   c.syntax = 'ios app_ids:list'
   c.summary = 'Lists the App IDs'
   c.description = ''
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     app_ids = try{agent.list_app_ids}
 

@@ -2,14 +2,8 @@ command :'devices:list' do |c|
   c.syntax = 'ios devices:list'
   c.summary = 'Lists the Name and ID of Devices in the Provisioning Portal'
   c.description = ''
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     devices = try{agent.list_devices}
 

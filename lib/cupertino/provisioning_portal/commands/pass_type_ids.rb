@@ -2,14 +2,8 @@ command :'pass_type_ids:list' do |c|
   c.syntax = 'ios pass_type_ids:list'
   c.summary = 'Lists the Pass Type IDs'
   c.description = ''
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     pass_type_ids = try{agent.list_pass_type_ids}
 
@@ -34,14 +28,8 @@ command :'pass_type_ids:add' do |c|
   c.summary = 'Adds the Pass Type to the Provisioning Portal'
   c.description = ''
   c.option '-d', '--description DESCRIPTION', 'Description'
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     pass_type_id = args.first
     pass_type_id ||= ask "Pass Type ID:"
@@ -61,14 +49,8 @@ command :'pass_type_ids:certificates:list' do |c|
   c.syntax = 'ios pass_type_ids:certificates:list PASS_TYPE_ID'
   c.summary = 'Lists the Pass Certificates for a specific Pass Type ID'
   c.description = ''
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     pass_type_id = args.first || determine_pass_type_id!
 
@@ -96,14 +78,8 @@ command :'pass_type_ids:certificates:add' do |c|
   c.summary = 'Adds the pass certificate for pass type ID to the Provisioning Portal'
   c.description = ''
   c.option '-r', '--csr CERTIFICATE_SIGNING_REQUEST', 'Path to Certificate Signing Request (CSR)'
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     pass_type_id = args.first || determine_pass_type_id!
 
@@ -135,14 +111,8 @@ command :'pass_type_ids:certificates:download' do |c|
   c.summary = 'Adds the pass certificate for pass type ID to the Provisioning Portal'
   c.description = ''
   c.option '-c', '--certificate_id ID', 'Certificate ID'
-  c.option '-u', '--username USER', 'Username'
-  c.option '-p', '--password PASSWORD', 'Password'
-  c.option '-tm', '--team TEAM', 'Team'
 
   c.action do |args, options|
-    agent.username = options.username unless options.username.nil?
-    agent.password = options.password unless options.password.nil?
-    agent.team = options.team unless options.team.nil?
 
     pass_type_id = args.first || determine_pass_type_id!
 
