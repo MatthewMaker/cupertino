@@ -59,7 +59,6 @@ module Cupertino
 
         certificate_data_url += certificate_request_types + certificate_statuses
 
-        #get(certificate_data_url)
         post(certificate_data_url)
         certificate_data = page.content
         parsed_certificate_data = JSON.parse(certificate_data)
@@ -71,7 +70,7 @@ module Cupertino
           certificate.type = type
           certificate.download_url = "https://developer.apple.com/account/ios/certificate/certificateContentDownload.action?displayId=#{row['certificateId']}&type=#{row['certificateTypeDisplayId']}"
           certificate.expiration_date = row['expirationDateString']
-          #certificate.status = row['statusString']
+          certificate.status = row['statusString']
           certificates << certificate
         end
 
@@ -94,7 +93,6 @@ module Cupertino
         regex = /deviceDataURL = "([^"]*)"/
         device_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
 
-        #get(device_data_url)
         post(device_data_url)
 
         device_data = page.content
@@ -170,7 +168,6 @@ module Cupertino
                               '&type=production'
                             end
 
-        #get(profile_data_url)
         post(profile_data_url)
 
         profile_data = page.content
@@ -243,7 +240,6 @@ module Cupertino
         regex = /bundleDataURL = "([^"]*)"/
         bundle_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
 
-        #get(bundle_data_url)
         post(bundle_data_url)
         bundle_data = page.content
         parsed_bundle_data = JSON.parse(bundle_data)
