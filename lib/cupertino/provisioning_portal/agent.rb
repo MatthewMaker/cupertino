@@ -7,13 +7,20 @@ require 'logger'
 module Cupertino
   module ProvisioningPortal
     class Agent < ::Mechanize
-      attr_accessor :username, :password, :team
+      attr_accessor :username, :password, :team #, :proxystring, :proxy_addr
 
-      def initialize
-        super
+      def initialize(proxy_string = nil)
+        puts 'init called with', proxy_string
+        super()
         self.user_agent_alias = 'Mac Safari'
 
-        get_proxy_from_env
+        if proxy_string then
+          puts 'proxy_string is ', proxy_string
+          @proxy_addr = proxy_string
+          use_proxy(proxy_string)
+        #else
+          #get_proxy_from_env
+        end
 
         pw = Security::InternetPassword.find(:server => Cupertino::ProvisioningPortal::HOST)
         @username, @password = pw.attributes['acct'], pw.password if pw
@@ -25,22 +32,34 @@ module Cupertino
         @log = log
       end
 
+      def use_proxy(arg)
+        puts "Use proxy #{arg}"
+        puts '---'
+        uri = URI.parse(normalize_uri(arg))
+        #@proxy_addr = uri.host
+        #@proxy_port = uri.port
+        if uri and uri.user.nil? and uri.password.nil? then
+          # Probably we have http_proxy_* variables?
+          user = (ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER'])
+          pass = (ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS'])
+          uri.user = user  #URI::escape(user) unless user.nil?
+          uri.password = pass  # URI::escape(pass) unless pass.nil?
+          #@proxy_user = user
+          #@proxy_pass = pass
+          puts @proxy_addr, @proxy_port, @proxy_user, @proxy_pass
+        end
+        set_proxy(uri.host, uri.port, user, pass)
+        uri
+      end
+
       ##
       # Returns an HTTP proxy URI if one is set in the environment variables.
       def get_proxy_from_env
+        puts 'get_proxy_from_env'
         env_proxy = ENV['http_proxy'] || ENV['HTTP_PROXY']
         return nil if env_proxy.nil? or env_proxy.empty?
-        uri = URI.parse(normalize_uri(env_proxy))
-        @proxy_addr = uri.host
-        @proxy_port = uri.port
-        if uri and uri.user.nil? and uri.password.nil? then
-          # Probably we have http_proxy_* variables?
-          uri.user = escape(ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER'])
-          uri.password = escape(ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS'])
-          @proxy_user = uri.user
-          @proxy_pass = uri.pass
-        end
-        uri
+
+        use_proxy(env_proxy)
       end
 
       ##
@@ -50,6 +69,8 @@ module Cupertino
       end
 
       def get(uri, parameters = [], referer = nil, headers = {})
+        #get_proxy_from_env
+        puts 'calling get', @proxy_addr
         uri = ::File.join("https://#{Cupertino::ProvisioningPortal::HOST}", uri) unless /^https?/ === uri
 
         3.times do

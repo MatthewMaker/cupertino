@@ -10,9 +10,13 @@ end
 module Cupertino
   module ProvisioningPortal
     module Helpers
+      def doproxy(proxy)
+        @agent = Cupertino::ProvisioningPortal::Agent.new(proxy)
+      end
+
       def agent
         unless @agent
-          @agent = Cupertino::ProvisioningPortal::Agent.new
+          @agent = Cupertino::ProvisioningPortal::Agent.new(nil)
 
           @agent.instance_eval do
             def username
