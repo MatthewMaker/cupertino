@@ -4,6 +4,9 @@ command :'profiles:list' do |c|
   c.description = ''
 
   c.action do |args, options|
+
+    agent.use_proxy(options.foo) if options.foo and not options.noproxy
+
     type = args.first.downcase.to_sym rescue nil
     profiles = try{agent.list_profiles(type ||= :development)}
 
