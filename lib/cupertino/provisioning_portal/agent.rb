@@ -241,7 +241,7 @@ module Cupertino
 
         list_profiles(profile.type)
 
-        get(profile.edit_url)
+        post(profile.edit_url)
 
         on, off = [], []
         page.search('dd.selectDevices div.rows div').each do |row|
