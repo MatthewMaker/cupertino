@@ -100,7 +100,7 @@ module Cupertino
 
         certificate_data_url += certificate_request_types + certificate_statuses
 
-        get(certificate_data_url)
+        post(certificate_data_url)
         certificate_data = page.content
         parsed_certificate_data = JSON.parse(certificate_data)
 
@@ -122,7 +122,7 @@ module Cupertino
         list_certificates(certificate.type)
 
         self.pluggable_parser.default = Mechanize::Download
-        download = get(certificate.download_url)
+        download = post(certificate.download_url)
         download.save
         download.filename
       end
@@ -133,7 +133,8 @@ module Cupertino
         regex = /deviceDataURL = "([^"]*)"/
         device_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
 
-        get(device_data_url)
+        post(device_data_url)
+
         device_data = page.content
         parsed_device_data = JSON.parse(device_data)
 
@@ -206,7 +207,8 @@ module Cupertino
                               '&type=production'
                             end
 
-        get(profile_data_url)
+        post(profile_data_url)
+
         profile_data = page.content
         parsed_profile_data = JSON.parse(profile_data)
 
@@ -277,7 +279,7 @@ module Cupertino
         regex = /bundleDataURL = "([^"]*)"/
         bundle_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
 
-        get(bundle_data_url)
+        post(bundle_data_url)
         bundle_data = page.content
         parsed_bundle_data = JSON.parse(bundle_data)
 
