@@ -195,6 +195,7 @@ module Cupertino
                 raise ArgumentError, 'Provisioning profile type must be :development or :distribution'
               end
 
+        self.pluggable_parser.default = Mechanize::File
         get(url)
 
         regex = /profileDataURL = "([^"]*)"/
