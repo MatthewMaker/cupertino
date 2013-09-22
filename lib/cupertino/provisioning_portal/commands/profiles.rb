@@ -36,7 +36,6 @@ command :'profiles:download' do |c|
   c.description = ''
 
   c.action do |args, options|
-
     type = args.first.downcase.to_sym rescue nil
     profiles = try{agent.list_profiles(type ||= :development)}
     profiles = profiles.find_all{|profile| profile.status == 'Active'}
@@ -51,14 +50,12 @@ command :'profiles:download' do |c|
   end
 end
 
-
 command :'profiles:download:all' do |c|
   c.syntax = 'ios profiles:download:all [development|distribution]'
   c.summary = 'Downloads all the active Provisioning Profiles'
   c.description = ''
 
   c.action do |args, options|
-
     type = args.first.downcase.to_sym rescue nil
     profiles = try{agent.list_profiles(type ||= :development)}
     profiles = profiles.find_all{|profile| profile.status == 'Active'}
@@ -80,7 +77,6 @@ command :'profiles:manage:devices' do |c|
   c.description = ''
 
   c.action do |args, options|
-
     type = args.first.downcase.to_sym rescue nil
     profiles = try{agent.list_profiles(type ||= :development)}
 
@@ -111,8 +107,7 @@ command :'profiles:manage:devices' do |c|
   end
 end
 
-alias_command :'profiles:manage', :'profiles:manage:devices'
-
+alias_command :'profiles:devices', :'profiles:manage:devices'
 
 command :'profiles:manage:devices:add' do |c|
   c.syntax = 'ios profiles:manage:devices:add PROFILE_NAME DEVICE_NAME=DEVICE_ID [...]'
@@ -120,7 +115,6 @@ command :'profiles:manage:devices:add' do |c|
   c.description = ''
 
   c.action do |args, options|
-
     type = args.first.downcase.to_sym rescue nil
     profiles = try{agent.list_profiles(type ||= :development)}
     profiles = profiles.find_all{|profile| profile.status == 'Active'}
@@ -175,4 +169,3 @@ command :'profiles:manage:devices:remove' do |c|
 end
 
 alias_command :'profiles:devices:remove', :'profiles:manage:devices:remove'
-

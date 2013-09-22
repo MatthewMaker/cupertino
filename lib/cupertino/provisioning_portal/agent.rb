@@ -19,12 +19,6 @@ module Cupertino
         @username, @password = pw.attributes['acct'], pw.password if pw
       end
 
-      def log_level(level)
-        log = Logger.new(STDOUT)
-        log.level = level
-        @log = log
-      end
-
       def use_proxy(arg)
         puts "Using proxy #{arg}"
         puts '-----------'
@@ -53,6 +47,12 @@ module Cupertino
       # Normalize the URI by adding "http://" if it is missing.
       def normalize_uri(uri)
         (uri =~ /^(https?|ftp|file):/) ? uri : "http://#{uri}"
+      end
+
+      def log_level(level)
+        log = Logger.new(STDOUT)
+        log.level = level
+        @log = log
       end
 
       def get(uri, parameters = [], referer = nil, headers = {})
