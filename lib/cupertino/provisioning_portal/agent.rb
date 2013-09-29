@@ -109,7 +109,7 @@ module Cupertino
                   raise ArgumentError, "Certificate type must be :development or :distribution"
               end
 
-        get(url)
+        get(url) #TODO test this
 
         regex = /certificateDataURL = "([^"]*)"/
         certificate_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
@@ -150,7 +150,7 @@ module Cupertino
       end
 
       def list_devices
-        get('https://developer.apple.com/account/ios/device/deviceList.action')
+        get('https://developer.apple.com/account/ios/device/deviceList.action')    #TODO test this
 
         regex = /deviceDataURL = "([^"]*)"/
         device_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
@@ -174,7 +174,7 @@ module Cupertino
       def add_devices(*devices)
         return if devices.empty?
 
-        get('https://developer.apple.com/account/ios/device/deviceCreate.action')
+        get('https://developer.apple.com/account/ios/device/deviceCreate.action') #TODO test this
 
         begin
           file = Tempfile.new(%w(devices .txt))
@@ -297,7 +297,7 @@ module Cupertino
       end
 
       def list_app_ids
-        get('https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action')
+        get('https://developer.apple.com/account/ios/identifiers/bundle/bundleList.action') #TODO test this
 
         regex = /bundleDataURL = "([^"]*)"/
         bundle_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
