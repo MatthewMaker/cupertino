@@ -55,15 +55,37 @@ module Cupertino
         @log = log
       end
 
-      def get(uri, parameters = [], referer = nil, headers = {})
+      def post(uri, query = {}, headers = {})
         uri = ::File.join("https://#{Cupertino::ProvisioningPortal::HOST}", uri) unless /^https?/ === uri
 
+#TODO could rescue Net::HTTP::Persistent::Error here, and if there's a proxy, suggest that the proxy is not available
+        3.times do
+          super(uri, query, headers)
+
+          return page unless page.respond_to?(:title)
+
+          case page.title
+            when /Sign in with your Apple ID/
+              login! and redo
+            when /Select Team/
+              select_team! and redo
+            else
+              return page
+          end
+        end
+
+        raise UnsuccessfulAuthenticationError
+      end
+
+      def get(uri, parameters = [], referer = nil, headers = {}) #TODO make a post() version of this
+        uri = ::File.join("https://#{Cupertino::ProvisioningPortal::HOST}", uri) unless /^https?/ === uri
+
+#TODO could rescue Net::HTTP::Persistent::Error here, and if there's a proxy, suggest that the proxy is not available
         3.times do
           super(uri, parameters, referer, headers)
 
           return page unless page.respond_to?(:title)
 
-#TODO could rescue Net::HTTP::Persistent::Error here, and if there's a proxy, suggest that the proxy is not available
           case page.title
             when /Sign in with your Apple ID/
               login! and redo
