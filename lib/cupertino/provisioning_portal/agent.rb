@@ -208,17 +208,18 @@ module Cupertino
       end
 
       def list_profiles(type = :development)
-        url = case type
+        url = 'https://developer.apple.com/account/ios/profile/profileList.action'
+        filter = case type # TODO move this into a POST parameter, then?
               when :development
-                'https://developer.apple.com/account/ios/profile/profileList.action?type=limited'
+                'limited'
               when :distribution
-                'https://developer.apple.com/account/ios/profile/profileList.action?type=production'
+                'production'
               else
                 raise ArgumentError, 'Provisioning profile type must be :development or :distribution'
               end
 
         self.pluggable_parser.default = Mechanize::File
-        get(url)
+        post(url, "type" => filter)
 
         regex = /profileDataURL = "([^"]*)"/
         profile_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
