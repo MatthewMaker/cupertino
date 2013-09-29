@@ -10,7 +10,7 @@ command :'profiles:list' do |c|
     say_warning "No #{type} provisioning profiles found." and abort if profiles.empty?
 
     table = Terminal::Table.new do |t|
-      t << ["Profile", "App ID", "Status"]
+      t << ["Profile", "App ID", "Profile ID", "UUID", "Status"]
       t.add_separator
       profiles.each do |profile|
         status = case profile.status
@@ -20,7 +20,7 @@ command :'profiles:list' do |c|
                    profile.status.green
                  end
 
-        t << [profile.name, profile.app_id, status]
+        t << [profile.name, profile.app_id, profile.id, profile.uuid, status]
       end
     end
 
@@ -117,10 +117,6 @@ command :'profiles:manage:devices:add' do |c|
   c.action do |args, options|
     profiles = try{agent.list_profiles(:development) + agent.list_profiles(:distribution)}
     profile = profiles.find {|profile| profile.name == args.first }
-
-#    type = args.first.downcase.to_sym rescue nil
-#    profiles = try{agent.list_profiles(type ||= :development)}
-#    profiles = profiles.find_all{|profile| profile.status == 'Active'}
 
     say_warning "No provisioning profiles named #{args.first} were found." and abort unless profile
 

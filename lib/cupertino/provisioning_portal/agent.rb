@@ -208,17 +208,18 @@ module Cupertino
       end
 
       def list_profiles(type = :development)
-        url = case type
+        url = 'https://developer.apple.com/account/ios/profile/profileList.action'
+        filter = case type # TODO move this into a POST parameter, then?
               when :development
-                'https://developer.apple.com/account/ios/profile/profileList.action?type=limited'
+                'limited'
               when :distribution
-                'https://developer.apple.com/account/ios/profile/profileList.action?type=production'
+                'production'
               else
                 raise ArgumentError, 'Provisioning profile type must be :development or :distribution'
               end
 
         self.pluggable_parser.default = Mechanize::File
-        get(url)
+        post(url, "type" => filter)
 
         regex = /profileDataURL = "([^"]*)"/
         profile_data_url = (page.body.match regex or raise UnexpectedContentError)[1]
@@ -241,9 +242,11 @@ module Cupertino
           profile.name = row['name']
           profile.type = type
           profile.app_id = row['appId']['appIdId']
+          profile.id = row['provisioningProfileId']
           profile.status = row['status']
+          profile.uuid = row['UUID']
           profile.download_url = "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=#{row['provisioningProfileId']}"
-          profile.edit_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?provisioningProfileId=#{row['provisioningProfileId']}"
+          profile.edit_url = "https://developer.apple.com/account/ios/profile/profileEdit.action" #"?provisioningProfileId=#{row['provisioningProfileId']}"
           profiles << profile
         end
         profiles
@@ -260,10 +263,18 @@ module Cupertino
 
       def manage_devices_for_profile(profile)
         raise ArgumentError unless block_given?
+        filter = case profile.type
+                   when :development
+                     'limited'
+                   when :distribution
+                     'production'
+                   else
+                     raise ArgumentError, 'Provisioning profile type must be :development or :distribution'
+                 end
 
-        list_profiles(profile.type)
-
-        post(profile.edit_url)
+        #list_profiles(profile.type) # do we need this?
+        post(profile.edit_url, {'type'=> filter,
+                               'provisioningProfileId'=> profile.id}) #are cookies also getting sent?
 
         on, off = [], []
         page.search('dd.selectDevices div.rows div').each do |row|
@@ -292,7 +303,11 @@ module Cupertino
           end
         end
 
-        form.method = 'GET'
+        form.method = 'POST'
+
+        adssuv = cookies.find{|cookie| cookie.name == 'adssuv'}
+        form.add_field!('adssuv-value', Mechanize::Util::uri_unescape(adssuv.value))
+        form.add_field!('type', filter)
         form.submit
       end
 
