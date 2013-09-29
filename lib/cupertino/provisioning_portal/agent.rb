@@ -209,7 +209,7 @@ module Cupertino
 
       def list_profiles(type = :development)
         url = 'https://developer.apple.com/account/ios/profile/profileList.action'
-        filter = case type # TODO move this into a POST parameter, then?
+        filter = case type
               when :development
                 'limited'
               when :distribution
