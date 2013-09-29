@@ -227,6 +227,9 @@ module Cupertino
         end
 
         form.method = 'POST'
+        adssuv = cookies.find{|cookie| cookie.name == 'adssuv'}
+        form.add_field!('adssuv-value', Mechanize::Util::uri_unescape(adssuv.value))
+        form.add_field!('type', filter)
         form.submit
       end
 
