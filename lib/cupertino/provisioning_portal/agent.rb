@@ -253,7 +253,7 @@ module Cupertino
         list_profiles(profile.type)
 
         self.pluggable_parser.default = Mechanize::Download
-        download = get(profile.download_url)
+        download = post(profile.download_url) #XXX double-check this against firefox
         download.save
         download.filename
       end
