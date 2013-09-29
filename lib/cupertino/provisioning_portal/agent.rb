@@ -242,7 +242,9 @@ module Cupertino
           profile.name = row['name']
           profile.type = type
           profile.app_id = row['appId']['appIdId']
+          profile.id = row['provisioningProfileId']
           profile.status = row['status']
+          profile.uuid = row['UUID']
           profile.download_url = "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=#{row['provisioningProfileId']}"
           profile.edit_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?provisioningProfileId=#{row['provisioningProfileId']}"
           profiles << profile
