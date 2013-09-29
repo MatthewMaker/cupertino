@@ -246,7 +246,7 @@ module Cupertino
           profile.status = row['status']
           profile.uuid = row['UUID']
           profile.download_url = "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=#{row['provisioningProfileId']}"
-          profile.edit_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?provisioningProfileId=#{row['provisioningProfileId']}"
+          profile.edit_url = "https://developer.apple.com/account/ios/profile/profileEdit.action" #"?provisioningProfileId=#{row['provisioningProfileId']}"
           profiles << profile
         end
         profiles
@@ -263,10 +263,18 @@ module Cupertino
 
       def manage_devices_for_profile(profile)
         raise ArgumentError unless block_given?
+        filter = case profile.type
+                   when :development
+                     'limited'
+                   when :distribution
+                     'production'
+                   else
+                     raise ArgumentError, 'Provisioning profile type must be :development or :distribution'
+                 end
 
-        list_profiles(profile.type)
-
-        post(profile.edit_url)
+        #list_profiles(profile.type) # do we need this?
+        post(profile.edit_url, {'type'=> filter,
+                               'provisioningProfileId'=> profile.id}) #are cookies also getting sent?
 
         on, off = [], []
         page.search('dd.selectDevices div.rows div').each do |row|
