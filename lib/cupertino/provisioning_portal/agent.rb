@@ -199,6 +199,21 @@ module Cupertino
 
         get(profile.edit_url)
 
+        certificatesSelectedCount = 0
+        # note: if you've had the certificate expire recently and/or be regenerated, it *won't* automatically
+        # be selected, even if it's the only choice!
+        certificateCheckboxes = page.search('dd.selectCertificates div.rows div')
+        certificateCheckboxes.each do |row|
+          checkbox = row.search('input[type="checkbox"]').first
+          certName = row.search('span.title').text rescue nil
+          if checkbox['checked']
+            say_ok "certificate '#{certName}' is selected"
+            certificatesSelectedCount += 1
+          else
+            say_ok "certificate '#{certName}' is not selected"
+          end
+        end
+
         on, off = [], []
         page.search('dd.selectDevices div.rows div').each do |row|
           checkbox = row.search('input[type="checkbox"]').first
@@ -226,8 +241,21 @@ module Cupertino
           end
         end
 
+        say_ok "there are #{certificateCheckboxes.count} certificates that can be selected here. #{certificatesSelectedCount} are selected."
+        #if not, pick the first one (if any are available)
+        if (certificateCheckboxes && certificatesSelectedCount < 1)
+          say_ok "automatically selecting the first certificate"
+          checkbox = form.checkboxes_with(:name => 'certificateIds').first
+          checkbox.check
+        end
+
         form.method = 'POST'
         form.submit
+        # rather than silently failing, let the user know if their certificate has gone
+        regex = /No value was provided for the parameter .certificateIds./
+        if (page.body.match regex)
+          raise CertificateExpiredError
+        end
       end
 
       def list_app_ids

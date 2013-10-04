@@ -7,6 +7,7 @@ module Cupertino
 
     class UnsuccessfulAuthenticationError < RuntimeError; end
     class UnexpectedContentError < RuntimeError; end
+    class CertificateExpiredError < RuntimeError; end
 
     class Device < Struct.new(:name, :udid)
       def to_s
