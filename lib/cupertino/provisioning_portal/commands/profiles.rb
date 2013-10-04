@@ -118,10 +118,6 @@ command :'profiles:manage:devices:add' do |c|
     profiles = try{agent.list_profiles(:development) + agent.list_profiles(:distribution)}
     profile = profiles.find {|profile| profile.name == args.first }
 
-#    type = args.first.downcase.to_sym rescue nil
-#    profiles = try{agent.list_profiles(type ||= :development)}
-#    profiles = profiles.find_all{|profile| profile.status == 'Active'}
-
     say_warning "No provisioning profiles named #{args.first} were found." and abort unless profile
 
     devices = []
