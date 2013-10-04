@@ -11,42 +11,19 @@ module Cupertino
 
       def initialize
         super
+
         self.user_agent_alias = 'Mac Safari'
 
-        get_proxy_from_env
+        if ENV['HTTP_PROXY']
+          uri = URI.parse(ENV['HTTP_PROXY'])
+          user = ENV['HTTP_PROXY_USER'] if ENV['HTTP_PROXY_USER']
+          password = ENV['HTTP_PROXY_PASSWORD'] if ENV['HTTP_PROXY_PASSWORD']
+
+          set_proxy(uri.host, uri.port, user || uri.user, password || uri.password)
+        end
 
         pw = Security::InternetPassword.find(:server => Cupertino::ProvisioningPortal::HOST)
         @username, @password = pw.attributes['acct'], pw.password if pw
-      end
-
-      def use_proxy(arg)
-        puts "Using proxy #{arg}"
-        puts '-----------'
-        uri = URI.parse(normalize_uri(arg))
-        if uri and uri.user.nil? and uri.password.nil? then
-          # Probably we have http_proxy_* variables?
-          user = (ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER'])
-          pass = (ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS'])
-          uri.user = user
-          uri.password = pass
-        end
-        set_proxy(uri.host, uri.port, user, pass)
-        uri
-      end
-
-      ##
-      # Returns an HTTP proxy URI if one is set in the environment variables.
-      def get_proxy_from_env
-        env_proxy = ENV['http_proxy'] || ENV['HTTP_PROXY']
-        return nil if env_proxy.nil? or env_proxy.empty?
-
-        use_proxy(env_proxy)
-      end
-
-      ##
-      # Normalize the URI by adding "http://" if it is missing.
-      def normalize_uri(uri)
-        (uri =~ /^(https?|ftp|file):/) ? uri : "http://#{uri}"
       end
 
       def log_level(level)
@@ -58,7 +35,6 @@ module Cupertino
       def post(uri, query = {}, headers = {})
         uri = ::File.join("https://#{Cupertino::ProvisioningPortal::HOST}", uri) unless /^https?/ === uri
 
-#TODO could rescue Net::HTTP::Persistent::Error here, and if there's a proxy, suggest that the proxy is not available
         3.times do
           super(uri, query, headers)
 
@@ -80,7 +56,6 @@ module Cupertino
       def get(uri, parameters = [], referer = nil, headers = {}) #TODO make a post() version of this
         uri = ::File.join("https://#{Cupertino::ProvisioningPortal::HOST}", uri) unless /^https?/ === uri
 
-#TODO could rescue Net::HTTP::Persistent::Error here, and if there's a proxy, suggest that the proxy is not available
         3.times do
           super(uri, parameters, referer, headers)
 
@@ -165,6 +140,7 @@ module Cupertino
           device = Device.new
           device.name = row['name']
           device.udid = row['deviceNumber'] # Apple doesn't provide the UDID on this page anymore
+          device.enabled = (row['status'] == 'c' ? 'Y' : 'N')
           devices << device
         end
 
