@@ -3,7 +3,7 @@
 Automate administrative tasks that you would normally have to do through the Apple Dev Center websites. Life's too short to manage device identifiers by hand!
 
 > Cupertino is named after [Cupertino, CA](http://en.wikipedia.org/wiki/Cupertino,_California): home to Apple, Inc.'s world headquarters.
-> It's part of a series of world-class command-line utilities for iOS development, which includes [Shenzhen](https://github.com/mattt/shenzhen) (Building & Distribution), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), and [Dubai](https://github.com/mattt/dubai) (Passbook pass generation).
+> It's part of a series of world-class command-line utilities for iOS development, which includes [Shenzhen](https://github.com/mattt/shenzhen) (Building & Distribution), [Houston](https://github.com/mattt/houston) (Push Notifications), [Venice](https://github.com/mattt/venice) (In-App Purchase Receipt Verification), [Dubai](https://github.com/mattt/dubai) (Passbook pass generation), and [Nashville](https://github.com/nomad/nashville) (iTunes Store API).
 
 ## Requirements
 
@@ -139,6 +139,15 @@ $ ios certificates:download --type distribution
 $ ios certificates:download NAME
 ```
 
+## CSV Output
+
+The following commands will format their output as [comma-separated values](http://en.wikipedia.org/wiki/Comma-separated_values) when the `--format csv` argument is passed:
+
+- `app_ids:list`
+- `devices:list`
+- `profiles:list`
+- `profiles:manage:devices:list`
+
 ## Commands
 
 - `login`
@@ -156,27 +165,13 @@ $ ios certificates:download NAME
 - `certificates:download`
 - `app_ids:list`
 
-### Disabled Commands
-
-> With the latest updates to the Apple Developer Portal, the following functionality has been removed.
-
-- `pass_type_ids:list`
-- `pass_type_ids:add`
-- `pass_type_ids:certificates:list`
-- `pass_type_ids:certificates:add`
-- `pass_type_ids:certificates:download`
-
 ## Proxies
 
 Cupertino will access the provisioning portal through a proxy if the `HTTP_PROXY` environment variable is set, with optional credentials `HTTP_PROXY_USER` and `HTTP_PROXY_PASSWORD`.
 
-## Contact
+## Creator
 
-Mattt Thompson
-
-- http://github.com/mattt
-- http://twitter.com/mattt
-- m@mattt.me
+Mattt Thompson ([@mattt](https://twitter.com/mattt))
 
 ## License
 

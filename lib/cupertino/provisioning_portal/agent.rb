@@ -9,11 +9,11 @@ require 'logger'
 module Cupertino
   module ProvisioningPortal
     class Agent < ::Mechanize
-      attr_accessor :username, :password, :team
+      attr_accessor :username, :password, :team, :team_id
 
       def initialize
         super
-
+        @profile_csrf_headers = {}
         self.user_agent_alias = 'Mac Safari'
 
         self.log ||= Logger.new(STDOUT)
@@ -48,9 +48,9 @@ module Cupertino
 
           case page.title
           when /Sign in with your Apple ID/
-            login! and redo
+            login!
           when /Select Team/
-            select_team! and redo
+            select_team!
           else
             return page
           end
@@ -193,6 +193,15 @@ module Cupertino
                             end
 
         post(profile_data_url)
+        @profile_csrf_headers = {
+          'csrf' => page.response['csrf'],
+          'csrf_ts' => page.response['csrf_ts']
+        }
+
+        @profile_csrf_headers = {
+          'csrf' => page.response['csrf'],
+          'csrf_ts' => page.response['csrf_ts']
+        }
 
         profile_data = page.content
         parsed_profile_data = JSON.parse(profile_data)
@@ -202,11 +211,11 @@ module Cupertino
           profile = ProvisioningProfile.new
           profile.name = row['name']
           profile.type = type
-          profile.app_id = row['appId']['appIdId']
           profile.status = row['status']
           profile.expiration = (Time.parse(row['dateExpire']) rescue nil)
           profile.download_url = "https://developer.apple.com/account/ios/profile/profileContentDownload.action?displayId=#{row['provisioningProfileId']}"
           profile.edit_url = "https://developer.apple.com/account/ios/profile/profileEdit.action?provisioningProfileId=#{row['provisioningProfileId']}"
+          profile.identifier = row['UUID']
           profiles << profile
         end
 
@@ -258,7 +267,7 @@ module Cupertino
         form.add_field!('adssuv-value', Mechanize::Util::uri_unescape(adssuv.value))
 
         form.method = 'POST'
-        form.submit
+        form.submit(nil, @profile_csrf_headers)
       end
 
       def list_devices_for_profile(profile)
@@ -292,9 +301,9 @@ module Cupertino
         form.method = 'POST'
         form.action = "https://developer.apple.com/account/ios/identifiers/bundle/bundleConfirm.action"
         form.field_with(:name => "appIdName").value = app_id.description
-        form.field_with(:name => "explicitIdentifier").value = app_id.bundle_seed_id
+        form.field_with(:name => "explicitIdentifier").value = app_id.identifier
         form.checkbox_with(:name => "push").check()
-        form.add_field!("appIdentifierString", app_id.bundle_seed_id)
+        form.add_field!("appIdentifierString", app_id.identifier)
         form.add_field!("formID", "#{rand(10000000)}")
         form.add_field!("clientToken", "undefined")
         form.submit
@@ -309,8 +318,8 @@ module Cupertino
           form.add_field!("gameCenter", "on")
           form.add_field!("push", "on")
 
-          form.add_field!("explicitIdentifier", app_id.bundle_seed_id)
-          form.add_field!("appIdentifierString", app_id.bundle_seed_id)
+          form.add_field!("explicitIdentifier", app_id.identifier)
+          form.add_field!("appIdentifierString", app_id.identifier)
           form.add_field!("appIdName", app_id.description)
           form.add_field!("type", "explicit")
 
@@ -337,6 +346,7 @@ module Cupertino
           app_id = AppID.new
           app_id.bundle_seed_id = [row['prefix'], row['identifier']].join(".")
           app_id.description = row['name']
+          app_id.identifier = row['identifier']
 
           app_id.development_properties, app_id.distribution_properties = [], []
           row['features'].each do |feature, value|
